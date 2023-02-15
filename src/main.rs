@@ -13,15 +13,19 @@ fn main() -> Result<(), Error> {
     let output = str::from_utf8(&output.stdout)?
         .split("WSL")
         .nth(1)
-        .ok_or(Error::msg("No WSL listing in ipconfig"))?;
+        .ok_or_else(|| Error::msg("No WSL listing in ipconfig"))?;
 
     // split on IPv4 address so we get a string starting with what we want
-    let output = output.split("IPv4 Address. . . . . . . . . . . : ")
+    let output = output
+        .split("IPv4 Address. . . . . . . . . . . : ")
         .nth(1)
-        .ok_or(Error::msg("No IPv4 address found"))?;
+        .ok_or_else(|| Error::msg("No IPv4 address found"))?;
 
     // first line should just include the IP address
-    let ip = output.lines().nth(0).ok_or(Error::msg("No IPv4 address found"))?;
+    let ip = output
+        .lines()
+        .next()
+        .ok_or_else(|| Error::msg("No IPv4 address found"))?;
 
     // print it
     println!("{}", ip);
